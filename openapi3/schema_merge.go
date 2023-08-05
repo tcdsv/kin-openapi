@@ -6,18 +6,6 @@ type SchemaCollection struct {
 	// include arrays of all additional Schema fields
 }
 
-// Merge replaces objects under AllOf with a flattened equivalent
-func Merge(schema Schema) (*Schema, error) {
-	if !isListOfObjects(&schema) {
-		return &schema, nil
-	}
-	if schema.AllOf != nil {
-
-	}
-	schema.AllOf = nil
-	return &schema, nil
-}
-
 func collect(schemas []*Schema) SchemaCollection {
 	collection := SchemaCollection{}
 	for _, s := range schemas {
@@ -38,6 +26,18 @@ func mergeFields(schema *Schema, collection *SchemaCollection) (*Schema, error) 
 	// merge additional fields ...
 
 	return schema, nil
+}
+
+// Merge replaces objects under AllOf with a flattened equivalent
+func Merge(schema Schema) (*Schema, error) {
+	if !isListOfObjects(&schema) {
+		return &schema, nil
+	}
+	if schema.AllOf != nil {
+		schema, err := mergeAllOf(schema.AllOf)
+	}
+	schema.AllOf = nil
+	return &schema, nil
 }
 
 func mergeAllOf(allOf SchemaRefs) (Schema, error) {
